@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use MongoDB\Laravel\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
+
+class catsubmenu extends Eloquent
+{
+    use HasFactory, Notifiable;
+
+    protected $connection = 'mongodb';
+    protected $table = 'catsubmenu';
+    protected $primaryKey = 'ecodSubmenu'; 
+    protected $keyType = 'string';
+    public $incrementing = false;
+    public $timestamps = false;
+
+    protected $fillable = [
+        'ecodSubmenu',
+        'tNombre',
+        'tUrl',
+    ];
+}
