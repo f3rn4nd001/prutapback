@@ -24,10 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('api')
                 ->group(base_path('routes/login.php'));
 
-                $basePath = base_path('routes/Catalogo');
-                foreach (glob($basePath . '/*.php') as $filename) {
+                //directorio de rutas carpeta Catalogo y sus sub carpetas
+                $Path = base_path('routes/Catalogo');
+                $PathRecursivoDirectorio = new RecursiveDirectoryIterator($Path);
+                $PathRecursIvoterator = new RecursiveIteratorIterator($PathRecursivoDirectorio);
+                foreach ($PathRecursIvoterator as $filename) {
+                    if ($filename->isFile() && $filename->getExtension() === 'php') {
+                        app()->router->middleware('api')->group($filename->getPathname());
+                    }
+                }
+                $sistemasPath = base_path('routes/Sistemas');
+                foreach (glob($sistemasPath . '/*.php') as $filename) {
                     app()->router->middleware('api')->group($filename);
                 }
+               
         }
     )
 
