@@ -41,6 +41,7 @@ class loginController extends Controller
                 $result; 
             }
             try{
+                //espera el correo y la contraseña y busca coincidencias en bitcorreo, si encuentre hace una comparacion de la contrasela guardada con la enviada
                 $exito = 1;
                 $Email = (isset($result['email']) && $result['email'] != "" ? "" . (trim($result['email'])) . "" : "");           
                 $password = (isset($result['password']) && $result['password'] != "" ? "" . (trim($result['password'])) . "" : "");
@@ -52,6 +53,7 @@ class loginController extends Controller
                     $Usuario = catusuario::where('ecodUsuario', $ecodUsuario)->get();
                     $estatus = catestatus::where('ecodEstatus', $Usuario[0]->ecodEstatus)->value('tNombre');
                     $tipoUsuario = cattipousuario::where('ecodTipoUsuario', $Usuario[0]->ecodTipoUsuario)->value('tNombre');
+                    //si el usuario coincide y esta activo se crea un token de inicio de cecion y manda las vistas a cuales puede entrar
                     if ($estatus == "Activo") {
                         $user=bitcorreo::all()->where('tCorreo', $Email)->first();
                         $token=JWTAuth::fromUser($user);
@@ -116,6 +118,7 @@ class loginController extends Controller
                         
                         $exito = 0;
                     }
+                    //en caso que no este el usuario activo
                     else {
                         $data = [
                             'mensaje'=>"Esta cuenta no se encuentra activa",
@@ -170,9 +173,10 @@ class loginController extends Controller
                 }
                 $result; 
             }
+            //busca coincidencias de usuario
             $Email = (isset($result['email']) && $result['email'] != "" ? "" . (trim($result['email'])) . "" : "");           
             $sqlEcodCorreo = bitcorreo::where('tCorreo', $Email)->first();
-               
+            //si encuentra crea una contraseña nueva, la incrita guarda y la envia por correo               
             if (!empty($sqlEcodCorreo)) {
                 $password = Str::password(12); 
                 Bitcorreo::where('tCorreo',$Email)->update([
@@ -199,7 +203,7 @@ class loginController extends Controller
         $returResponse =$encriptar->shiftText($jsonData, 23);
         return response()->json($returResponse,202);
     }
-
+    /// ignorar esto por el momento
     function postValidadContrasena(Request $request){
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));

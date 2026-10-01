@@ -19,6 +19,7 @@ use App\Models\logcatproducro;
 class productos extends Controller
 {
     public function getRegistro(Request $request){
+        //pide los registras de productos filtrando por nombre, nPrecioy estatus
         $encriptar = new encriptar();
         $objetArray = new objetArray();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
@@ -73,6 +74,7 @@ class productos extends Controller
     }
 
     public function getDetalles(Request $request){
+        //muestra los detalles del guardado de un producto de la tabla catproductos
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = (isset($jsonX->data)&&$jsonX->data!="" ? "".(trim($jsonX->data))."":   Null);
@@ -133,6 +135,7 @@ class productos extends Controller
     }
 
     public function postRegistro(Request $request){
+        //Guardar informacion del usuario
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = isset($jsonX->Producto) ? $jsonX->Producto : [];
@@ -145,7 +148,7 @@ class productos extends Controller
         if (isset($json->Marca->ecodMarca)) $data['ecodMarca'] = trim($json->Marca->ecodMarca, '');
         $ecodProductos = (isset($json->ecodProductos)&&$json->ecodProductos!="" ? "".(trim($json->ecodProductos))."":   Null);
         $ecodCorreo = trim($jsonH->ecodCorreo, '"');
-
+        //si el producto no esta registrado(ecod) se crea un id nuevo, revisa que no se tepita un producto
         if ($ecodProductos == Null) {
             $uuiecod = Uuid::uuid4();
             $data['ecodProductos'] = (isset($uuiecod)&&$uuiecod!="" ? "".(trim($uuiecod))."":   Null);
@@ -201,7 +204,11 @@ class productos extends Controller
         $returResponse2 =$encriptar->shiftText($jsonData, 23);
         return response()->json($returResponse2);
     }
+
+    // logs -> insert de logs usuarios
     public function logs($data) {
+        //se pide los datos del usuario y se guarda en el log
+
         $Logdata = [];
         $sqllog = catproductos::where('ecodProductos',$data)->get();
        
@@ -221,6 +228,7 @@ class productos extends Controller
     }
 
     public function postEliminar(Request $request){
+        //Crea un log. Elimina el producto de catproductos
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = isset($jsonX->formGroup) ? $jsonX->formGroup : [];

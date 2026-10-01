@@ -5,6 +5,8 @@ namespace App\Http\Controllers\seg;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+// Encriptacion de informacion 
+
 class encriptar extends Controller
 {
     public $CHAR_RANGE = 126 - 32 + 1;

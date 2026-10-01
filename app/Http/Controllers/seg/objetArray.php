@@ -5,6 +5,8 @@ namespace App\Http\Controllers\seg;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+//combierte objetos a array
+
 class objetArray extends Controller
 {
     public function objeto_a_array($data){

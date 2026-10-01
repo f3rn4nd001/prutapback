@@ -13,7 +13,8 @@ use App\Http\Controllers\seg\encriptar;
 use App\Http\Controllers\seg\objetArray;
 
 class relrutas extends Controller
-{
+{ 
+    // registras de la tabla relmenusubmenucontroller
     public function getRegistro(Request $request){
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));

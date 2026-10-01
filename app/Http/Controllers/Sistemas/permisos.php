@@ -16,6 +16,7 @@ use App\Models\catcontroller;
 class permisos extends Controller
 {
     public function getDetalles(Request $request){
+        //tra los detalles de las vistas relacionadas a un usuario
          $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = (isset($jsonX->data)&&$jsonX->data!="" ? "".(trim($jsonX->data))."":   Null);

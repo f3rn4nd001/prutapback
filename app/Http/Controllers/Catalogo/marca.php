@@ -15,6 +15,7 @@ use App\Models\catmodelo;
 class marca extends Controller
 {
     public function getComprementos(Request $request){
+        //filtra las marcas por nombre y estatus
         $encriptar = new encriptar();
         $objetArray = new objetArray();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));

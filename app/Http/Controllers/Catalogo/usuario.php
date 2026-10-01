@@ -18,6 +18,7 @@ use Carbon\Carbon;
 class usuario extends Controller
 {
     public function getRegistro(Request $request){
+        //pide los registras de usuario filtrando pornombre, apellido, rfc,curp y estatus
         $encriptar = new encriptar();
         $objetArray = new objetArray();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
@@ -75,6 +76,7 @@ class usuario extends Controller
     }
 
     public function getDetalles(Request $request){
+        //muestra los detalles del guardado de un usuario de la tabla catusuario
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = (isset($jsonX->data)&&$jsonX->data!="" ? "".(trim($jsonX->data))."":   Null);
@@ -159,6 +161,7 @@ class usuario extends Controller
 
 
     public function postRegistro(Request $request){
+        //Guardar informacion del usuario
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = isset($jsonX->Usuario) ? $jsonX->Usuario : [];
@@ -180,7 +183,7 @@ class usuario extends Controller
         if (isset($json->ecodTipoUsuario)&&$json->ecodTipoUsuario!="") $data['ecodTipoUsuario'] = trim($json->ecodTipoUsuario, '"');
         $ecodUsuario = (isset($json->ecodUsuario)&&$json->ecodUsuario!="" ? "".(trim($json->ecodUsuario))."":   Null);
         $ecodCorreo = trim($jsonH->ecodCorreo, '"');
-
+        //si el usuario no estaregistrado(ecod) se crea un id nuevo, si tiene un correo se revisa que no exista otro usuario con ese mismo correo
         if ($ecodUsuario == Null) {
             $uuiecodUsuario = Uuid::uuid4();
             $data['ecodUsuario'] = (isset($uuiecodUsuario)&&$uuiecodUsuario!="" ? "".(trim($uuiecodUsuario))."":   Null);
@@ -217,7 +220,9 @@ class usuario extends Controller
             } 
             $responseUsuario = $data['ecodUsuario'];
         }
+        // En el caso queel usiario este registrao
         else {
+            //se hace un llamado al log y actualisa los datos de usuaario / tambien los del correo(valida si tiene correo sino siene y tra uno lo crea en el caso contrario lo edita)
             $this->logs($ecodUsuario);
             $data['fhEdicion'] = Carbon::now();
             $data['ecodEstatus'] = (isset($json->ecodEstatus)&&$json->ecodEstatus!="" ? "".(trim($json->ecodEstatus))."":   Null);
@@ -264,6 +269,7 @@ class usuario extends Controller
     }
 
     public function postEliminar(Request $request){
+        //Crea un log. Elimina el usuario de catusuario, relusuariocorreo y su correo de Bitcorreo
         $encriptar = new encriptar();
         $jsonX =json_decode($encriptar->shiftText($request['datos'], -23));
         $json = isset($jsonX->formGroup) ? $jsonX->formGroup : [];
@@ -297,6 +303,7 @@ class usuario extends Controller
     // logs -> insert de logs usuarios
     public function logs($data) {
         $Logdata = [];
+        //se pide los datos del usuario y se guarda en el log
         $sqllogCatUsuario = catusuario::where('ecodUsuario',$data)->get();
         if (isset($sqllogCatUsuario[0]->tNombre)&&$sqllogCatUsuario[0]->tNombre!="") $Logdata['tNombre'] = trim($sqllogCatUsuario[0]->tNombre, '');
         if (isset($sqllogCatUsuario[0]->tApellido)&&$sqllogCatUsuario[0]->tApellido!="") $Logdata['tApellido'] = trim($sqllogCatUsuario[0]->tApellido, '');
@@ -344,7 +351,7 @@ class usuario extends Controller
         }
         
         $sql = catusuario::query()
-        ->when(!empty($tNombre), fn($q) => $q->where('tNombre', 'like', "%$tNombre%"))
+        ->when(!empty($tNombre), fn($q) => $q->whereRaw(['$expr' => ['$regexMatch' => ['input' => ['$concat' => ['$tNombre', ' ', '$tApellido']],'regex' => $tNombre,'options' => 'i']]]))
         ->orderBy($metodos->tMetodoOrdenamiento ?? 'tNombre', $metodos->orden ?? 'asc')
         ->limit($metodos->eNumeroRegistros ?? 10)
         ->get();
